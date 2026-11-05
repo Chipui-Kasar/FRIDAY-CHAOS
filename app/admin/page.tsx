@@ -120,7 +120,7 @@ export default function Admin() {
                 <td title={r.user_agent ?? ''}>{r.ip_address ?? '—'}</td>
                 <td><div className="acts">
                   {r.revealed_at ? (
-                    <button className="ghost" disabled={!!settings?.isOpen} onClick={() => revealOne(r, false)}>Hide</button>
+                    <button className="ghost" disabled={!!settings?.isOpen} title={settings?.isOpen ? 'Everyone is revealed. Use "Lock all again" above.' : ''} onClick={() => revealOne(r, false)}>Hide</button>
                   ) : (
                     <button disabled={!!settings?.isOpen} onClick={() => revealOne(r, true)}>🔓 Reveal</button>
                   )}

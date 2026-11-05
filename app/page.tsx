@@ -8,6 +8,7 @@ import AccessForm from './AccessForm';
 import Reveal from './Reveal';
 import Rules from './Rules';
 import Waiting from './Waiting';
+import Watch from './Watch';
 
 // Per-visitor (cookie-dependent) => always rendered on the server, never cached or shared.
 export const dynamic = 'force-dynamic';
@@ -31,7 +32,7 @@ export default async function Home() {
         {session.locked ? (
           <Waiting revealAtMs={session.revealAtMs} serverNowMs={session.serverNowMs} />
         ) : (
-        <Reveal emoji={emojiFor(session.assignment ?? '')} text={session.assignment ?? 'Nothing assigned yet — check back soon.'} />
+        <><Watch /><Reveal emoji={emojiFor(session.assignment ?? '')} text={session.assignment ?? 'Nothing assigned yet — check back soon.'} /></>
         )}
         <Rules />
         <p className="fine">Keep it secret 🤫 · Opened on this device only<br />

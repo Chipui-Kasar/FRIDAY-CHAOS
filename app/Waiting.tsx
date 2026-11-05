@@ -40,7 +40,7 @@ export default function Waiting({ revealAtMs, serverNowMs }: { revealAtMs: numbe
       setSecs((prev) => (prev === Math.max(0, left) ? prev : Math.max(0, left)));
       if (left <= 0) check();
     }, 500);
-    const poll = setInterval(() => { if (!document.hidden) check(); }, 10000);
+    const poll = setInterval(() => { if (!document.hidden) check(); }, 5000);
     const onVis = () => { if (!document.hidden) check(); };
     document.addEventListener('visibilitychange', onVis);
     const jk = setInterval(() => { if (!document.hidden) setJoke((j) => (j + 1) % JOKES.length); }, 6000);
