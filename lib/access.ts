@@ -49,6 +49,8 @@ export type Session = {
   participant: Participant;
   /** null while the reveal is locked: the text is never even read from the table until the host opens it. */
   assignment: string | null;
+  /** Optional Tamil translation; same reveal rule as `assignment`. */
+  assignmentTa: string | null;
   locked: boolean;
   revealAtMs: number | null;
   serverNowMs: number;
@@ -75,7 +77,8 @@ export async function loadSession(db: Db, token: string | undefined): Promise<Se
               (extract(epoch FROM now()) * 1000)::bigint AS now_ms
          FROM game_settings WHERE id = 1)
      SELECT me.id, me.name, me.email, (cfg.is_open OR me.own_open) AS is_open, cfg.reveal_at_ms, cfg.now_ms,
-            CASE WHEN (cfg.is_open OR me.own_open) THEN (SELECT content FROM assignments WHERE participant_id = me.id) END AS assignment
+            CASE WHEN (cfg.is_open OR me.own_open) THEN (SELECT content FROM assignments WHERE participant_id = me.id) END AS assignment,
+            CASE WHEN (cfg.is_open OR me.own_open) THEN (SELECT content_ta FROM assignments WHERE participant_id = me.id) END AS assignment_ta
        FROM me CROSS JOIN cfg`,
     [sha256Hex(token)],
   );
@@ -84,6 +87,7 @@ export async function loadSession(db: Db, token: string | undefined): Promise<Se
   return {
     participant: { id: r.id, name: r.name, email: r.email },
     assignment: r.is_open ? r.assignment ?? null : null,
+    assignmentTa: r.is_open ? r.assignment_ta ?? null : null,
     locked: !r.is_open,
     revealAtMs: r.reveal_at_ms == null ? null : Number(r.reveal_at_ms),
     serverNowMs: Number(r.now_ms),

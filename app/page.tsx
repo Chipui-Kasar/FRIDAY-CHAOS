@@ -32,7 +32,7 @@ export default async function Home() {
         {session.locked ? (
           <Waiting revealAtMs={session.revealAtMs} serverNowMs={session.serverNowMs} />
         ) : (
-        <><Watch /><Reveal emoji={emojiFor(session.assignment ?? '')} text={session.assignment ?? 'Nothing assigned yet — check back soon.'} /></>
+        <><Watch /><Reveal textTa={session.assignmentTa} emoji={emojiFor((session.assignment ?? '').split('\n')[0])} text={session.assignment ?? 'Nothing assigned yet — check back soon.'} /></>
         )}
         <Rules />
         <p className="fine">Keep it secret 🤫 · Opened on this device only<br />

@@ -82,7 +82,7 @@ export async function handleAssignment(req: Request) {
     return json({ error: 'Not signed in on this device.' }, 401);
   }
   await logEvent(db, { participantId: s.participant.id, event: 'view_assignment', success: true }, meta(req));
-  return json({ name: s.participant.name, assignment: s.assignment, locked: s.locked, revealAtMs: s.revealAtMs, serverNowMs: s.serverNowMs });
+  return json({ name: s.participant.name, assignment: s.assignment, assignmentTa: s.assignmentTa, locked: s.locked, revealAtMs: s.revealAtMs, serverNowMs: s.serverNowMs });
 }
 
 // ---------- admin ----------
