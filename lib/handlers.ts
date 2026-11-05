@@ -1,5 +1,5 @@
 import {
-  adminLogs, adminOverview, authenticateDevice, getAssignment, logEvent, rateLimit, registerDevice,
+  adminLogs, adminOverview, authenticateDevice, loadSession, logEvent, rateLimit, registerDevice,
   resetDeviceAccess, revokeDeviceAccess, type Meta,
 } from './access';
 import { getDb } from './db';
@@ -69,15 +69,13 @@ export async function handleAccess(req: Request) {
 /** GET /api/assignment — identity comes ONLY from the HttpOnly cookie. No id/email input is read. */
 export async function handleAssignment(req: Request) {
   const db = getDb();
-  const m = meta(req);
-  const p = await authenticateDevice(db, readCookie(req, DEVICE_COOKIE));
-  if (!p) {
-    await logEvent(db, { event: 'view_assignment', success: false, detail: 'no_valid_device' }, m);
+  const s = await loadSession(db, readCookie(req, DEVICE_COOKIE));
+  if (!s) {
+    await logEvent(db, { event: 'view_assignment', success: false, detail: 'no_valid_device' }, meta(req));
     return json({ error: 'Not signed in on this device.' }, 401);
   }
-  const content = await getAssignment(db, p.id);
-  await logEvent(db, { participantId: p.id, event: 'view_assignment', success: true }, m);
-  return json({ name: p.name, assignment: content });
+  await logEvent(db, { participantId: s.participant.id, event: 'view_assignment', success: true }, meta(req));
+  return json({ name: s.participant.name, assignment: s.assignment });
 }
 
 // ---------- admin ----------

@@ -99,6 +99,23 @@ Vercel → Project → **Settings → Domains** → add your domain and follow t
 
 ---
 
+## 9. Make it fast (do these two things)
+The code is already optimised (see "What makes it fast" below). Two settings outside the code matter most:
+
+1. **Put Vercel and Neon in the same region.** Each database call crosses that distance.
+   - Note your Neon region (Project → Settings, e.g. `aws-us-east-1`).
+   - Vercel → Project → **Settings → Functions → Function Region** → pick the matching one (`us-east-1` = `iad1`, `eu-central-1` = `fra1`, `ap-south-1` = `bom1`, `ap-southeast-1` = `sin1`). Redeploy.
+2. **Avoid Neon cold starts.** Neon suspends idle compute (free tier: after 5 minutes), and the first query after that takes about 0.5–2 s.
+   - Before game day: Neon → Branch → Compute settings → turn **Scale to zero off** (paid plans), or
+   - On the free plan: open `https://<your-app>/api/health` yourself 1–2 minutes before announcing the link, or point a free uptime monitor (UptimeRobot, cron-job.org) at it every 5 minutes during the event. `/api/health` runs a `SELECT 1`.
+
+### What makes it fast
+- **Server-rendered home page:** a returning participant gets their assignment inside the first HTML response. There is no loading skeleton and no second API call.
+- **No cookie means no database call.** First-time visitors get the form straight from the server.
+- **One round trip:** authentication and the assignment come from a single SQL query over Neon's stateless HTTP driver (no WebSocket handshake).
+- **Read-mostly:** `last_accessed_at` is only written if it is more than a minute old. The "view" audit log is written after the response is sent (`after()`).
+- **Tiny payload:** about 104 kB of JavaScript, system fonts, no images, no third-party scripts.
+
 ## Changing characters later
 Edit the third column in `db/setup-and-seed.sql` and re-run it in the Neon SQL Editor. It updates names and characters and never touches device locks, so people who already opened theirs will see the new text on their next visit.
 

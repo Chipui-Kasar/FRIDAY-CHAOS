@@ -1,4 +1,4 @@
-import { Pool, neonConfig } from '@neondatabase/serverless';
+import { Pool, neon, neonConfig } from '@neondatabase/serverless';
 import ws from 'ws';
 
 export interface Queryable {
@@ -21,14 +21,18 @@ export function getDb(): Db {
   const url = process.env.DATABASE_URL;
   if (!url) throw new Error('DATABASE_URL is not set');
   if (typeof WebSocket === 'undefined') neonConfig.webSocketConstructor = ws;
-  const pool = new Pool({ connectionString: url });
+  // Reads/writes: stateless HTTP (one round trip, no connection handshake) — the fast path.
+  const http = neon(url);
+  // Transactions (rare: first-device registration only) need a real connection; created lazily.
+  let pool: Pool | undefined;
+  const getPool = () => (pool ??= new Pool({ connectionString: url }));
   current = {
-    query: async (sql, params) => (await pool.query(sql, params as any[])).rows,
+    query: async (sql, params) => (await http.query(sql, params as any[])) as any[],
     exec: async (sql) => {
-      await pool.query(sql);
+      await getPool().query(sql);
     },
     tx: async (fn) => {
-      const c = await pool.connect();
+      const c = await getPool().connect();
       try {
         await c.query('BEGIN');
         const r = await fn({ query: async (sql, params) => (await c.query(sql, params as any[])).rows });

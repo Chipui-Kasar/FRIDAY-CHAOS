@@ -43,6 +43,31 @@ export async function authenticateDevice(db: Db, token: string | undefined): Pro
   return rows[0] ?? null;
 }
 
+export type Session = { participant: Participant; assignment: string | null };
+
+/**
+ * Hot path: authenticate the device AND fetch the assignment in ONE round trip.
+ * last_accessed_at is only written when stale (>1 min) so most page views are read-only.
+ */
+export async function loadSession(db: Db, token: string | undefined): Promise<Session | null> {
+  if (!isTokenShape(token)) return null;
+  const rows = await db.query<Participant & { assignment: string | null }>(
+    `WITH me AS (
+       SELECT a.id AS access_id, p.id, p.name, p.email
+         FROM participant_device_access a JOIN participants p ON p.id = a.participant_id
+        WHERE a.device_token_hash = $1 AND a.revoked_at IS NULL AND p.is_active),
+     touch AS (
+       UPDATE participant_device_access d SET last_accessed_at = now() FROM me
+        WHERE d.id = me.access_id AND d.last_accessed_at < now() - interval '1 minute' RETURNING d.id)
+     SELECT me.id, me.name, me.email,
+            (SELECT content FROM assignments WHERE participant_id = me.id) AS assignment
+       FROM me`,
+    [sha256Hex(token)],
+  );
+  const r = rows[0];
+  return r ? { participant: { id: r.id, name: r.name, email: r.email }, assignment: r.assignment } : null;
+}
+
 export type RegisterResult =
   | { status: 'registered'; token: string; participant: Participant }
   | { status: 'unavailable' }
@@ -89,13 +114,6 @@ export async function registerDevice(db: Db, email: string, meta: Meta): Promise
     await logEvent(q, { participantId: p.id, email, event: 'register', success: true }, meta);
     return { status: 'registered', token, participant: p };
   });
-}
-
-export async function getAssignment(db: Db, participantId: string): Promise<string | null> {
-  const rows = await db.query<{ content: string }>(`SELECT content FROM assignments WHERE participant_id = $1`, [
-    participantId,
-  ]);
-  return rows[0]?.content ?? null;
 }
 
 // ---- admin actions ----
