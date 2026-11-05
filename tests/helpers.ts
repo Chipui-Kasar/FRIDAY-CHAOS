@@ -3,13 +3,13 @@ import { readFileSync } from 'node:fs';
 import { setDb, type Db } from '@/lib/db';
 import {
   handleAccess, handleAdminLogin, handleAdminLogs, handleAdminOverview, handleAdminReset, handleAdminRevoke,
-  handleAssignment,
+  handleAssignment, handleAdminSettings, handleAdminReveal,
 } from '@/lib/handlers';
 
 export const A = { name: 'Ada', email: 'ada@example.com', assignment: 'ASSIGNMENT-FOR-ADA' };
 export const B = { name: 'Bob', email: 'bob@example.com', assignment: 'ASSIGNMENT-FOR-BOB' };
 
-export async function freshDb() {
+export async function freshDb(opts: { revealOpen?: boolean } = {}) {
   const pg = new PGlite();
   const db: Db = {
     query: async (s, p) => (await pg.query(s, p as any[])).rows as any,
@@ -21,6 +21,7 @@ export async function freshDb() {
     const [p] = await db.query<{ id: string }>(`INSERT INTO participants (name,email) VALUES ($1,$2) RETURNING id`, [u.name, u.email]);
     await db.query(`INSERT INTO assignments (participant_id, content) VALUES ($1,$2)`, [p.id, u.assignment]);
   }
+  await db.query(`UPDATE game_settings SET reveal_open = $1`, [opts.revealOpen ?? true]);
   setDb(db);
   process.env.ADMIN_PASSWORD = 'host-pass';
   process.env.ADMIN_SESSION_SECRET = 'test-secret';
@@ -55,6 +56,8 @@ export class Browser {
   assignment = (path = '/api/assignment', headers?: Record<string, string>) => this.call(handleAssignment, path, { headers });
   adminLogin = (password = 'host-pass') => this.call(handleAdminLogin, '/api/admin/login', { body: { password } });
   overview = () => this.call(handleAdminOverview, '/api/admin/overview');
+  settings = (body: unknown) => this.call(handleAdminSettings, '/api/admin/settings', { body });
+  revealPerson = (participantId: string, revealed = true) => this.call(handleAdminReveal, '/api/admin/reveal', { body: { participantId, revealed } });
   logs = () => this.call(handleAdminLogs, '/api/admin/logs');
   reset = (participantId: string) => this.call(handleAdminReset, '/api/admin/reset', { body: { participantId } });
   revoke = (participantId: string) => this.call(handleAdminRevoke, '/api/admin/revoke', { body: { participantId } });

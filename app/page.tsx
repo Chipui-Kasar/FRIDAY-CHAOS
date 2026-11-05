@@ -3,8 +3,11 @@ import { after } from 'next/server';
 import { logEvent, loadSession } from '../lib/access';
 import { getDb } from '../lib/db';
 import { DEVICE_COOKIE } from '../lib/security';
+import { EVENT_EMOJI, emojiFor } from '../lib/brand';
 import AccessForm from './AccessForm';
 import Reveal from './Reveal';
+import Rules from './Rules';
+import Waiting from './Waiting';
 
 // Per-visitor (cookie-dependent) => always rendered on the server, never cached or shared.
 export const dynamic = 'force-dynamic';
@@ -21,13 +24,21 @@ export default async function Home() {
     after(() => logEvent(getDb(), { participantId: session.participant.id, event: 'view_assignment', success: true }, meta).catch(() => {}));
     return (
       <main><div className="card">
-        <span className="emoji">🎉</span>
+        <span className="emoji">{EVENT_EMOJI}</span>
+        <div className="eyebrow">SharePoint Designs presents</div>
         <h1>Hi {session.participant.name.split(' ')[0]}!</h1>
-        <p className="sub">Your Friday assignment:</p>
-        <Reveal text={session.assignment ?? 'Nothing assigned yet — check back soon.'} />
-        <p className="fine">Keep it secret 🤫 · Opened on this device only</p>
+        <p className="sub">{session.locked ? 'Your assignment is locked 🔒' : 'Your Friday assignment'} <span className="chip">Shared with: Only you</span></p>
+        {session.locked ? (
+          <Waiting revealAtMs={session.revealAtMs} serverNowMs={session.serverNowMs} />
+        ) : (
+        <Reveal emoji={emojiFor(session.assignment ?? '')} text={session.assignment ?? 'Nothing assigned yet — check back soon.'} />
+        )}
+        <Rules />
+        <p className="fine">Keep it secret 🤫 · Opened on this device only<br />
+        Last modified by: Fate · Version 1.0 (no version history, sorry)</p>
+        <p className="brand">© SharePoint Designs · Powered by questionable decisions</p>
       </div></main>
     );
   }
-  return <main><div className="card"><span className="emoji">🎉</span><AccessForm /></div></main>;
+  return <main><div className="card"><span className="emoji">{EVENT_EMOJI}</span><AccessForm /></div></main>;
 }

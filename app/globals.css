@@ -13,7 +13,7 @@ body {
   background: radial-gradient(1200px 500px at 50% -10%, color-mix(in srgb, var(--brand) 22%, transparent), transparent), var(--bg);
 }
 main { min-height: 100vh; display: grid; place-items: center; padding: 24px 16px; }
-.card { width: 100%; max-width: 440px; background: var(--card); border: 1px solid var(--line); border-radius: 20px; padding: 32px 28px; box-shadow: var(--shadow); }
+.card { width: 100%; max-width: 640px; min-width: min(100%, 520px); background: var(--card); border: 1px solid var(--line); border-radius: 20px; padding: 40px 40px; box-shadow: var(--shadow); }
 .wide { max-width: 1100px; }
 h1 { margin: 0 0 4px; font-size: 1.75rem; letter-spacing: -.02em; }
 h2 { margin: 0 0 12px; font-size: 1.1rem; }
@@ -48,3 +48,62 @@ td { padding: 10px; border-bottom: 1px solid var(--line); vertical-align: middle
 .pill.revoked { background: color-mix(in srgb, var(--bad) 15%, transparent); color: var(--bad); }
 .pill.reset_pending { background: color-mix(in srgb, var(--warn) 15%, transparent); color: var(--warn); }
 .acts { display: flex; gap: 6px; } .ok { color: var(--ok); } .bad { color: var(--bad); }
+
+.eyebrow { display: inline-block; font-size: .72rem; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; padding: 4px 10px; border-radius: 99px; margin-bottom: 10px; color: var(--brand); background: color-mix(in srgb, var(--brand) 14%, transparent); }
+.tag { min-height: 3em; margin: -12px 0 16px; font-size: .85rem; color: var(--muted); animation: fade .5s; }
+@keyframes fade { from { opacity: 0; transform: translateY(4px); } }
+.joke { margin-top: 6px; font-size: .82rem; opacity: .85; }
+.chip { display: inline-block; margin-left: 6px; padding: 1px 8px; font-size: .7rem; font-weight: 700; border-radius: 99px; color: var(--ok); background: color-mix(in srgb, var(--ok) 14%, transparent); vertical-align: middle; }
+.brand { margin: 14px 0 0; text-align: center; font-size: .7rem; letter-spacing: .02em; color: var(--muted); opacity: .8; }
+@media (prefers-reduced-motion: reduce) { .tag, .skel { animation: none; } }
+
+.rules { margin-top: 18px; padding: 18px 18px 14px; border-radius: 16px; border: 1px solid var(--line); animation: fade .5s; }
+.rules ol { margin: 0; padding-left: 20px; } .rules li { margin: 0 0 8px; font-size: .92rem; }
+.rules li::marker { color: var(--brand); font-weight: 700; }
+@media (max-width: 560px) { .card { padding: 28px 22px; min-width: 0; } }
+
+/* ---- polish ---- */
+h1 { background: linear-gradient(90deg, var(--text), var(--brand) 60%, var(--brand2)); -webkit-background-clip: text; background-clip: text; color: transparent; background-size: 200% 100%; }
+@keyframes shine { to { background-position: 100% 0; } }
+@keyframes bob { 50% { transform: translateY(-5px) rotate(-6deg); } }
+.eyebrow { animation: intro .9s cubic-bezier(.2,.8,.2,1) both; }
+@keyframes intro { from { opacity: 0; letter-spacing: .4em; } }
+.card { animation: rise .5s cubic-bezier(.2,.8,.2,1) both; }
+@keyframes rise { from { opacity: 0; transform: translateY(12px) scale(.98); } }
+.reveal { overflow: visible; }
+.bigemoji { font-size: 3.4rem; line-height: 1.1; margin-bottom: 8px; }
+.reveal.open .bigemoji { animation: pop .6s cubic-bezier(.2,1.6,.4,1) both; }
+.reveal.open .secret { animation: flip .6s ease both; }
+@keyframes pop { from { transform: scale(.2) rotate(-40deg); opacity: 0; } }
+@keyframes flip { from { transform: rotateX(90deg); opacity: 0; } }
+.reveal.hidden .bigemoji { filter: grayscale(1); opacity: .6; }
+.reveal.hidden button { z-index: 2; }
+.hidebtn { margin-top: 14px; }
+.confetti { position: absolute; left: 50%; top: 40%; pointer-events: none; z-index: 3; }
+.confetti i { position: absolute; width: 9px; height: 14px; border-radius: 2px; opacity: 0; animation: fly 1.4s cubic-bezier(.15,.7,.3,1) forwards; }
+@keyframes fly { 0% { opacity: 1; transform: translate(0,0) rotate(0); } 35% { opacity: 1; transform: translate(calc(var(--x) * .7), var(--y)) rotate(calc(var(--r) * .5)); } 100% { opacity: 0; transform: translate(var(--x), 220px) rotate(var(--r)); } }
+@media (prefers-reduced-motion: reduce) { h1, .emoji, .eyebrow, .card, .bigemoji, .secret, .confetti i { animation: none !important; } }
+
+/* ---- waiting room ---- */
+.waiting { text-align: center; padding: 26px 16px; border-radius: 16px; background: color-mix(in srgb, var(--brand) 9%, transparent); border: 1.5px dashed color-mix(in srgb, var(--brand) 45%, transparent); }
+.wlabel { font-size: .8rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); margin-bottom: 14px; }
+.clock { display: flex; justify-content: center; gap: 10px; flex-wrap: wrap; }
+.clock div { min-width: 74px; padding: 12px 8px; border-radius: 14px; background: var(--card); border: 1px solid var(--line); }
+.clock b { display: block; font-size: 2.2rem; line-height: 1.1; font-variant-numeric: tabular-nums; background: linear-gradient(135deg, var(--brand), var(--brand2)); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.clock span { font-size: .7rem; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); }
+.dots { display: flex; gap: 8px; justify-content: center; margin: 6px 0 4px; }
+.dots i { width: 12px; height: 12px; border-radius: 50%; background: linear-gradient(135deg, var(--brand), var(--brand2)); animation: dot 1.2s infinite ease-in-out; }
+.dots i:nth-child(2) { animation-delay: .15s; } .dots i:nth-child(3) { animation-delay: .3s; }
+@keyframes dot { 0%, 80%, 100% { transform: scale(.5); opacity: .4; } 40% { transform: scale(1); opacity: 1; } }
+.wjoke { margin: 18px 0 4px; font-size: .88rem; animation: fade .5s; }
+.wsub { margin: 0; font-size: .78rem; color: var(--muted); }
+@media (prefers-reduced-motion: reduce) { .dots i, .wjoke { animation: none !important; } }
+/* ---- admin reveal panel ---- */
+.panel { margin-bottom: 18px; padding: 16px 18px; border: 1px solid var(--line); border-radius: 16px; display: grid; gap: 12px; }
+.panel .row { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+.panel input[type=datetime-local] { width: auto; padding: 9px 12px; }
+.panel button { padding: 9px 16px; font-size: .9rem; }
+.state { font-weight: 700; } .state.open { color: var(--ok); } .state.locked { color: var(--warn); }
+
+.muted { color: var(--muted); }
+.acts button:not(.ghost):not(.danger) { padding: 7px 12px; font-size: .85rem; }

@@ -1,6 +1,6 @@
 import {
-  adminLogs, adminOverview, authenticateDevice, loadSession, logEvent, rateLimit, registerDevice,
-  resetDeviceAccess, revokeDeviceAccess, type Meta,
+  adminLogs, adminOverview, authenticateDevice, getSettings, loadSession, logEvent, updateSettings, type SettingsAction, rateLimit, rateLimitMany, registerDevice,
+  resetDeviceAccess, revokeDeviceAccess, setPersonReveal, type Meta,
 } from './access';
 import { getDb } from './db';
 import {
@@ -44,15 +44,22 @@ export async function handleAccess(req: Request) {
   const email = normalizeEmail(body.email);
   if (!email) return json({ error: UNAVAILABLE_MESSAGE }, 403);
 
-  const okIp = await rateLimit(db, `access:ip:${m.ip ?? 'unknown'}`, LIMITS.ipPerWindow, LIMITS.windowSec);
-  const okEmail = await rateLimit(db, `access:email:${sha256Hex(email)}`, LIMITS.emailPerWindow, LIMITS.windowSec);
-  if (!okIp || !okEmail) {
+  const allowed = await rateLimitMany(
+    db,
+    [
+      { key: `access:ip:${m.ip ?? 'unknown'}`, limit: LIMITS.ipPerWindow },
+      { key: `access:email:${sha256Hex(email)}`, limit: LIMITS.emailPerWindow },
+    ],
+    LIMITS.windowSec,
+  );
+  if (!allowed) {
     await logEvent(db, { email, event: 'register', success: false, detail: 'rate_limited' }, m);
     return json({ error: RATE_MESSAGE }, 429);
   }
 
   // Already-registered device re-entering its own email: just resume.
-  const current = await authenticateDevice(db, readCookie(req, DEVICE_COOKIE));
+  const cookieToken = readCookie(req, DEVICE_COOKIE);
+  const current = cookieToken ? await authenticateDevice(db, cookieToken) : null;
   if (current) {
     if (current.email === email) return json({ ok: true, name: current.name });
     // A device already bound to someone else may not claim a second identity.
@@ -75,7 +82,7 @@ export async function handleAssignment(req: Request) {
     return json({ error: 'Not signed in on this device.' }, 401);
   }
   await logEvent(db, { participantId: s.participant.id, event: 'view_assignment', success: true }, meta(req));
-  return json({ name: s.participant.name, assignment: s.assignment });
+  return json({ name: s.participant.name, assignment: s.assignment, locked: s.locked, revealAtMs: s.revealAtMs, serverNowMs: s.serverNowMs });
 }
 
 // ---------- admin ----------
@@ -99,7 +106,27 @@ export async function handleAdminLogin(req: Request) {
 }
 
 export async function handleAdminOverview(req: Request) {
-  return adminGuard(req) ?? json({ participants: await adminOverview(getDb()) });
+  const denied = adminGuard(req);
+  if (denied) return denied;
+  const db = getDb();
+  const [participants, settings] = await Promise.all([adminOverview(db), getSettings(db)]);
+  return json({ participants, settings });
+}
+
+export async function handleAdminSettings(req: Request) {
+  const denied = adminGuard(req);
+  if (denied) return denied;
+  const body = await readJson(req);
+  let a: SettingsAction | null = null;
+  if (body?.action === 'open' || body?.action === 'close' || body?.action === 'clear_schedule') a = { action: body.action };
+  else if (body?.action === 'schedule' && typeof body.at === 'string') {
+    const at = new Date(body.at);
+    if (!Number.isNaN(at.getTime())) a = { action: 'schedule', at };
+  }
+  if (!a) return json({ error: 'Bad request.' }, 400);
+  const db = getDb();
+  await updateSettings(db, a, meta(req));
+  return json({ ok: true, settings: await getSettings(db) });
 }
 
 export async function handleAdminLogs(req: Request) {
@@ -118,6 +145,14 @@ async function adminAction(req: Request, fn: typeof resetDeviceAccess) {
   if (!id) return json({ error: 'Bad request.' }, 400);
   const changed = await fn(getDb(), id, meta(req));
   return json({ ok: true, changed });
+}
+export async function handleAdminReveal(req: Request) {
+  const denied = adminGuard(req);
+  if (denied) return denied;
+  const body = await readJson(req);
+  const id = typeof body?.participantId === 'string' && /^[0-9a-f-]{36}$/i.test(body.participantId) ? body.participantId : null;
+  if (!id || typeof body?.revealed !== 'boolean') return json({ error: 'Bad request.' }, 400);
+  return json({ ok: true, changed: await setPersonReveal(getDb(), id, body.revealed, meta(req)) });
 }
 export const handleAdminReset = (req: Request) => adminAction(req, resetDeviceAccess);
 export const handleAdminRevoke = (req: Request) => adminAction(req, revokeDeviceAccess);

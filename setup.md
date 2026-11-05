@@ -21,6 +21,8 @@ Follow these in order. Total time: about 20 minutes.
    ```
    Keep it private. It is `DATABASE_URL`.
 
+> **Already ran an earlier version of the SQL?** Run `db/migrations/002-game-settings.sql` and then `db/migrations/003-person-reveal.sql` in the Neon SQL Editor (they add the reveal tables/columns and are safe to repeat). Without it the home page will error for logged-in participants.
+
 > `db/setup-and-seed.sql` contains the secret characters, so it is git-ignored. Never commit it or put it in a public repo.
 
 ## 2. Run it locally (recommended sanity check)
@@ -47,7 +49,7 @@ If you test with a real email, that device becomes the locked device. Afterwards
 ```bash
 git init
 git add .
-git commit -m "Fun Friday portal"
+git commit -m "Undercover Friday portal"
 git branch -M main
 ```
 Create a **private** repo on GitHub, then:
@@ -74,7 +76,7 @@ Check that `.env.local` and `db/setup-and-seed.sql` are **not** in the repo on G
 
 ## 5. Verify the deployment
 1. Open `https://<your-app>.vercel.app/admin` → sign in with `ADMIN_PASSWORD`. You should see 17 participants, all **unclaimed**.
-2. Open the main URL in a normal window → enter your own email → you should see the **Tap to reveal** card with your character.
+2. Open the main URL in a normal window → enter your own email → you should see a **waiting room** (your character stays hidden; you have no way to unlock it yourself). In `/admin` click **🔓 Reveal** on your row. Within about 8 seconds your page shows your character and the rules, with no action needed on your side.
 3. Open a **private/incognito window** → enter the same email → you should see *"This assignment has already been opened on another device…"*. This confirms the lock works.
 4. Back in `/admin`: your row shows **active**. Click **Reset access** and confirm. Now your device is revoked and the next device to enter your email claims it.
 5. Reload the main page in the first window. It should now show the email form (old token revoked).
@@ -82,6 +84,16 @@ Check that `.env.local` and `db/setup-and-seed.sql` are **not** in the repo on G
 If all five work, you're live.
 
 ## 6. Run the game day
+**Reveal switch:** a fresh deployment starts **LOCKED**. Participants can open the link and claim their device early, but they only see a waiting room until you open the reveal. The character text is not sent to their browser while locked.
+
+In `/admin`, the **Reveal status** panel gives you two ways to open it:
+- **Countdown:** pick a date and time → **Start countdown**. Participants see a live timer, and their page unlocks by itself at zero. The timer uses the server's clock, so a wrong phone clock doesn't matter.
+- **Reveal ALL:** click **🔓 Reveal ALL now**. Waiting participants unlock within about 8 seconds.
+- **One by one:** in the participants table, click **🔓 Reveal** on a row. Only that person's page unlocks (within about 8 seconds) and shows their character straight away; they cannot reveal or hide anything themselves. The button becomes **Hide** to undo it. Great for revealing in a specific order.
+- **🔒 Lock all again** hides every character instantly (including one-by-one reveals) and cancels any countdown.
+
+Suggested flow: share the link 10–15 minutes early so everyone claims their device, set the countdown, then watch the participant table fill up.
+
 1. Share the URL with the 17 participants (e.g. in your team chat). Tell them:
    - Use their own **work email** (`name@sharepointdesigns.com`).
    - Open it on **one device** (the phone or laptop they'll use). It can't be opened on a second one.
@@ -109,10 +121,16 @@ The code is already optimised (see "What makes it fast" below). Two settings out
    - Before game day: Neon → Branch → Compute settings → turn **Scale to zero off** (paid plans), or
    - On the free plan: open `https://<your-app>/api/health` yourself 1–2 minutes before announcing the link, or point a free uptime monitor (UptimeRobot, cron-job.org) at it every 5 minutes during the event. `/api/health` runs a `SELECT 1`.
 
+### Slow on localhost?
+`npm run dev` talks to Neon over the internet, so every database round trip costs your distance to the Neon region (measured here: about 275 ms per query, and about 2 s for the first queries after Neon woke up). To feel the real speed:
+- Create the Neon project in the region **closest to you** (Neon → Project settings; you can't move an existing one, so create a new project, run `db/setup-and-seed.sql` again and update `DATABASE_URL`).
+- Judge final speed on the deployed Vercel URL with Vercel's region set to match Neon.
+
 ### What makes it fast
 - **Server-rendered home page:** a returning participant gets their assignment inside the first HTML response. There is no loading skeleton and no second API call.
 - **No cookie means no database call.** First-time visitors get the form straight from the server.
 - **One round trip:** authentication and the assignment come from a single SQL query over Neon's stateless HTTP driver (no WebSocket handshake).
+- **One round trip per action:** registering a device, resetting/revoking, revealing and locking are each a single SQL statement (change + audit log together, still atomic). Rate-limit checks are one statement too. Admin buttons also update the screen instantly and confirm with the server in the background.
 - **Read-mostly:** `last_accessed_at` is only written if it is more than a minute old. The "view" audit log is written after the response is sent (`after()`).
 - **Tiny payload:** about 104 kB of JavaScript, system fonts, no images, no third-party scripts.
 

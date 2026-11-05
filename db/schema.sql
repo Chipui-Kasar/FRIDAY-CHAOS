@@ -1,4 +1,4 @@
--- Fun Friday portal schema (idempotent). Requires Postgres 13+ (gen_random_uuid built in).
+-- Undercover Friday portal schema (idempotent). Requires Postgres 13+ (gen_random_uuid built in).
 
 CREATE TABLE IF NOT EXISTS participants (
   id          UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -71,3 +71,15 @@ CREATE TABLE IF NOT EXISTS rate_limits (
   count        INTEGER NOT NULL DEFAULT 0,
   PRIMARY KEY (key, window_start)
 );
+
+-- Reveal switch + countdown. Idempotent. Default = LOCKED until the host opens it.
+CREATE TABLE IF NOT EXISTS game_settings (
+  id           SMALLINT PRIMARY KEY DEFAULT 1 CHECK (id = 1),   -- singleton row
+  reveal_open  BOOLEAN NOT NULL DEFAULT FALSE,
+  reveal_at    TIMESTAMPTZ,
+  updated_at   TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+INSERT INTO game_settings (id) VALUES (1) ON CONFLICT (id) DO NOTHING;
+
+-- Per-person reveal. Idempotent. NULL = not individually revealed.
+ALTER TABLE assignments ADD COLUMN IF NOT EXISTS revealed_at TIMESTAMPTZ;

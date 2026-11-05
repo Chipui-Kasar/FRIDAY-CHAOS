@@ -1,4 +1,4 @@
-# Fun Friday portal
+# Undercover Friday portal
 
 Private game portal for ~17 known participants. Enter your email → your assignment is bound to **the first device** that claims it. No OTP, no email verification, no magic links.
 
@@ -23,6 +23,12 @@ If your Neon `participants` table already exists, drop that `CREATE TABLE` from 
 6. Another browser → `This assignment has already been opened on another device. Contact the game host if you need access restored.`
 
 **Admin (`/admin`, password + HMAC-signed cookie):** status table, registration / last-access times, access logs, **Revoke** (locks the participant out until reset), **Reset access** (revokes the old token and permits exactly one new registration). Admin sees status only, never assignment text.
+
+**Reveal switch:** `game_settings` (singleton row) holds `reveal_open` and `reveal_at`. While locked, the server doesn't read or send the assignment text at all (checked in the same single query as device auth), so view-source can't peek. The waiting-room countdown is cosmetic; the server decides when to unlock.
+
+**Per-person reveal:** `assignments.revealed_at`. A character is shown if the global switch is open **or** that person's `revealed_at` is set; checked server-side in the same query. "Lock all" clears every individual reveal.
+
+**Host-controlled reveal only:** participants have no reveal/hide control. While locked the server never sends the text; once the host unlocks them (one person or all) the page shows the character directly.
 
 **Client storage:** `localStorage` holds email + first name (convenience prefill), `sessionStorage` a "revealed" flag. Never tokens or assignments. IndexedDB isn't needed and isn't used.
 
