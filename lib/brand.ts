@@ -17,5 +17,6 @@ const EMOJI_RULES: [RegExp, string][] = [
   [/detective/i, '🕵️'], [/ceo/i, '💼'], [/reporter|news/i, '🎤'], [/celebrity/i, '🌟'], [/teacher/i, '🍎'],
   [/robot/i, '🤖'], [/customer/i, '😠'], [/fitness|trainer/i, '🏋️'], [/time travel/i, '⏳'],
   [/restaurant|chef/i, '🍽️'], [/lawyer|potato/i, '🥔'], [/king|queen/i, '👑'],
+  [/pirate/i, '🏴‍☠️'], [/bus driver/i, '🚌'],
 ];
 export const emojiFor = (text: string) => EMOJI_RULES.find(([re]) => re.test(text))?.[1] ?? '🎭';
