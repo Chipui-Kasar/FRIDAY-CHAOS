@@ -7,6 +7,7 @@ import { EVENT_EMOJI, emojiFor } from '../lib/brand';
 import AccessForm from './AccessForm';
 import Reveal from './Reveal';
 import Rules from './Rules';
+import GameHub from './GameHub';
 import Waiting from './Waiting';
 import Watch from './Watch';
 
@@ -34,6 +35,7 @@ export default async function Home() {
         ) : (
         <><Watch /><Reveal textTa={session.assignmentTa} emoji={emojiFor((session.assignment ?? '').split('\n')[0])} text={session.assignment ?? 'Nothing assigned yet — check back soon.'} /></>
         )}
+        <GameHub />
         <Rules />
         <p className="fine">Keep it secret 🤫 · Opened on this device only<br />
         Last modified by: Fate · Version 1.0 (no version history, sorry)</p>
