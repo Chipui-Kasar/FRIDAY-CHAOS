@@ -3,7 +3,7 @@ import { readFileSync } from 'node:fs';
 import { setDb, type Db } from '@/lib/db';
 import {
   handleAccess, handleAdminLogin, handleAdminLogs, handleAdminOverview, handleAdminReset, handleAdminRevoke,
-  handleAssignment, handleAdminSettings, handleAdminReveal,
+  handleAssignment, handleAdminSettings, handleAdminReveal, handleSentence, handleAdminSentences,
 } from '@/lib/handlers';
 
 export const A = { name: 'Ada', email: 'ada@example.com', assignment: 'ASSIGNMENT-FOR-ADA' };
@@ -58,6 +58,8 @@ export class Browser {
   overview = () => this.call(handleAdminOverview, '/api/admin/overview');
   settings = (body: unknown) => this.call(handleAdminSettings, '/api/admin/settings', { body });
   revealPerson = (participantId: string, revealed = true) => this.call(handleAdminReveal, '/api/admin/reveal', { body: { participantId, revealed } });
+  sentence = (body?: unknown) => this.call(handleSentence, '/api/sentence', body === undefined ? {} : { body });
+  adminSentences = () => this.call(handleAdminSentences, '/api/admin/sentences');
   logs = () => this.call(handleAdminLogs, '/api/admin/logs');
   reset = (participantId: string) => this.call(handleAdminReset, '/api/admin/reset', { body: { participantId } });
   revoke = (participantId: string) => this.call(handleAdminRevoke, '/api/admin/revoke', { body: { participantId } });

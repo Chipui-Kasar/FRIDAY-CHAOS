@@ -161,3 +161,10 @@ h1 { background: linear-gradient(90deg, var(--text), var(--brand) 60%, var(--bra
 .tkhow { text-align: left; max-width: 480px; margin: 0 auto 14px; padding-left: 1.4em; font-size: 1.02rem; line-height: 1.6; }
 .tkhow li { margin-bottom: 6px; }
 .tkturn { margin: 6px 0; padding: 8px 14px; border-radius: 99px; display: inline-block; font-size: 1.1rem; background: color-mix(in srgb, var(--brand) 12%, transparent); border: 1px solid color-mix(in srgb, var(--brand) 30%, transparent); }
+
+/* ---- sentence form ---- */
+.sent { margin-top: 18px; padding: 20px 18px; border-radius: 16px; border: 1px solid var(--line); background: color-mix(in srgb, var(--brand2) 6%, transparent); text-align: center; }
+.sent h2 { margin: 0 0 10px; }
+.sentline { font-size: 1.15rem; font-weight: 600; line-height: 2.2; margin: 0; }
+.sentline input { display: inline-block; width: 9.5em; padding: 6px 10px; font-size: 1rem; margin: 0 2px; text-align: center; }
+.muted{color:var(--muted)}

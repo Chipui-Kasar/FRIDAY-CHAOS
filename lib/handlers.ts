@@ -1,6 +1,6 @@
 import {
   adminLogs, adminOverview, authenticateDevice, getSettings, loadSession, logEvent, updateSettings, type SettingsAction, rateLimit, rateLimitMany, registerDevice,
-  resetDeviceAccess, revokeDeviceAccess, setPersonReveal, type Meta,
+  resetDeviceAccess, revokeDeviceAccess, setPersonReveal, type Meta, adminSentences, getSentence, submitSentence,
 } from './access';
 import { getDb } from './db';
 import {
@@ -85,6 +85,29 @@ export async function handleAssignment(req: Request) {
   return json({ name: s.participant.name, assignment: s.assignment, assignmentTa: s.assignmentTa, locked: s.locked, revealAtMs: s.revealAtMs, serverNowMs: s.serverNowMs });
 }
 
+/** Collapse whitespace and cap the length; returns null if empty or too long. */
+const cleanBlank = (v: unknown): string | null => {
+  if (typeof v !== 'string') return null;
+  const t = v.replace(/\s+/g, ' ').trim();
+  return t.length >= 1 && t.length <= 100 ? t : null;
+};
+
+/** GET /api/sentence: this person's saved answer (or null). POST { blank1, blank2 }: save it ONCE; later edits are rejected. */
+export async function handleSentence(req: Request) {
+  const db = getDb();
+  const s = await loadSession(db, readCookie(req, DEVICE_COOKIE));
+  if (!s) return json({ error: 'Not signed in on this device.' }, 401);
+  if (req.method !== 'POST') return json({ answer: await getSentence(db, s.participant.id) });
+  const body = await readJson(req);
+  const blank1 = cleanBlank(body?.blank1);
+  const blank2 = cleanBlank(body?.blank2);
+  if (!blank1 || !blank2) return json({ error: 'Please fill in both blanks (up to 100 characters each).' }, 400);
+  if (!(await rateLimit(db, `sentence:${s.participant.id}`, 10, LIMITS.windowSec))) return json({ error: RATE_MESSAGE }, 429);
+  const saved = await submitSentence(db, s.participant.id, blank1, blank2);
+  if (!saved) return json({ error: 'You have already sent your answer. It cannot be changed.', answer: await getSentence(db, s.participant.id) }, 409);
+  return json({ ok: true, answer: saved });
+}
+
 // ---------- admin ----------
 
 function adminGuard(req: Request): Response | null {
@@ -111,6 +134,12 @@ export async function handleAdminOverview(req: Request) {
   const db = getDb();
   const [participants, settings] = await Promise.all([adminOverview(db), getSettings(db)]);
   return json({ participants, settings });
+}
+
+export async function handleAdminSentences(req: Request) {
+  const denied = adminGuard(req);
+  if (denied) return denied;
+  return json({ sentences: await adminSentences(getDb()) });
 }
 
 export async function handleAdminSettings(req: Request) {

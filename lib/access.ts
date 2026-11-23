@@ -227,3 +227,29 @@ export async function setPersonReveal(db: Db, participantId: string, revealed: b
   );
   return Number(r.n) > 0;
 }
+
+// ---------- Tangkhul fill-in-the-blank sentence (one submission per person, never editable) ----------
+
+export type SentenceAnswer = { blank1: string; blank2: string; created_at: string };
+
+export async function getSentence(db: Db, participantId: string): Promise<SentenceAnswer | null> {
+  const rows = await db.query<SentenceAnswer>(
+    `SELECT blank1, blank2, created_at FROM sentence_responses WHERE participant_id = $1`, [participantId]);
+  return rows[0] ?? null;
+}
+
+/** Returns the saved row, or null if this person had ALREADY submitted (the first answer always wins). */
+export async function submitSentence(db: Db, participantId: string, blank1: string, blank2: string): Promise<SentenceAnswer | null> {
+  const rows = await db.query<SentenceAnswer>(
+    `INSERT INTO sentence_responses (participant_id, blank1, blank2) VALUES ($1, $2, $3)
+     ON CONFLICT (participant_id) DO NOTHING RETURNING blank1, blank2, created_at`,
+    [participantId, blank1, blank2]);
+  return rows[0] ?? null;
+}
+
+export async function adminSentences(db: Db) {
+  return db.query(
+    `SELECT p.id, p.name, s.blank1, s.blank2, s.created_at
+       FROM participants p LEFT JOIN sentence_responses s ON s.participant_id = p.id
+      WHERE p.is_active ORDER BY s.created_at NULLS LAST, p.name`);
+}

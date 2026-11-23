@@ -69,6 +69,7 @@ export const SURVIVAL: Scenario[] = [
 /** Bonus challenges, read out by the host. */
 export const BONUS = {
   challenge: 'Use a newly learned Tangkhul word in a funny English sentence. Best sentence gets 3 bonus points.',
+  blank: 'Introduce yourself to the room in Tangkhul, with a big smile and a very confident voice. Funniest introduction gets 3 bonus points.',
   survival: 'No options this time. Pick a situation and try to communicate using only the Tangkhul words you learned today.',
 };
 

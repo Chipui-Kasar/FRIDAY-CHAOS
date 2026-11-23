@@ -10,21 +10,23 @@ const post = (url: string, body: unknown) => fetch(url, { method: 'POST', header
 
 export default function Admin() {
   const [authed, setAuthed] = useState<boolean | null>(null);
-  const [tab, setTab] = useState<'people' | 'logs'>('people');
+  const [tab, setTab] = useState<'people' | 'logs' | 'sentences'>('people');
   const [rows, setRows] = useState<Row[]>([]);
   const [logs, setLogs] = useState<Log[]>([]);
+  const [sentences, setSentences] = useState<{ id: string; name: string; blank1: string | null; blank2: string | null; created_at: string | null }[]>([]);
   const [pw, setPw] = useState('');
   const [err, setErr] = useState('');
   const [settings, setSettings] = useState<Settings | null>(null);
   const [when, setWhen] = useState('');
 
   const load = useCallback(async () => {
-    const [o, l] = await Promise.all([fetch('/api/admin/overview'), fetch('/api/admin/logs')]);
+    const [o, l, sn] = await Promise.all([fetch('/api/admin/overview'), fetch('/api/admin/logs'), fetch('/api/admin/sentences')]);
     if (o.status === 401 || o.status === 503) { setAuthed(false); if (o.status === 503) setErr('Admin is not configured on the server.'); return; }
     const od = await o.json();
     setRows(od.participants);
     setSettings(od.settings);
     setLogs((await l.json()).logs);
+    if (sn.ok) setSentences((await sn.json()).sentences);
     setAuthed(true);
   }, []);
   useEffect(() => { load(); }, [load]);
@@ -83,6 +85,7 @@ export default function Admin() {
         <div><h1>Host dashboard</h1><p className="sub" style={{ margin: 0 }}>{claimed} of {rows.length} participants have opened their assignment</p></div>
         <div className="tabs">
           <button className={tab === 'people' ? 'on' : ''} onClick={() => setTab('people')}>Participants</button>
+          <button className={tab === 'sentences' ? 'on' : ''} onClick={() => setTab('sentences')}>Sentences</button>
           <button className={tab === 'logs' ? 'on' : ''} onClick={() => setTab('logs')}>Access logs</button>
           <button className="ghost" onClick={load}>↻</button>
         </div>
@@ -128,6 +131,11 @@ export default function Admin() {
                   <button className="ghost" disabled={r.status === 'unclaimed' || r.status === 'reset_pending'} onClick={() => act('reset', r)}>Reset access</button>
                 </div></td>
               </tr>))}</tbody></table>
+        ) : tab === 'sentences' ? (
+          <table><thead><tr><th>Name</th><th>Iwui aming … hoya.</th><th>I … naona.</th><th>Sent</th></tr></thead>
+            <tbody>{sentences.map((r) => (
+              <tr key={r.id}><td>{r.name}</td>
+                <td>{r.blank1 ?? <span className="muted">not sent yet</span>}</td><td>{r.blank2 ?? '—'}</td><td>{fmt(r.created_at)}</td></tr>))}</tbody></table>
         ) : (
           <table><thead><tr><th>Time</th><th>Event</th><th>Result</th><th>Participant</th><th>Email tried</th><th>Detail</th><th>IP</th></tr></thead>
             <tbody>{logs.map((l) => (

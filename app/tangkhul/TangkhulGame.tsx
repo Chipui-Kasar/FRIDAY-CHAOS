@@ -1,8 +1,9 @@
 'use client';
 import { useEffect, useMemo, useState } from 'react';
+import SentenceForm from '../SentenceForm';
 import { BONUS, CHALLENGE, GOOD, SURVIVAL, STYLES, TRY, options, pick, type Item } from '../../lib/tangkhul';
 
-type Mode = 'challenge' | 'survival';
+type Mode = 'challenge' | 'survival' | 'blank';
 const MODES: { id: Mode; emoji: string; name: string; blurb: string; how: string[] }[] = [
   { id: 'challenge', emoji: '🗣️', name: 'Word Guess', blurb: 'See a Tangkhul word. Guess what it means.', how: [
     'A Tangkhul word appears on the screen.', 'Host taps "Pick a person": a random name is chosen, and nobody is picked twice until everyone has had a turn. Each person answers only ONE word. (The others can help or shout!)', 'The player guesses the meaning: A, B or C. Tamil or English is fine.',
@@ -12,6 +13,7 @@ const MODES: { id: Mode; emoji: string; name: string; blurb: string; how: string
     'The screen shows a situation, for example: a village auntie hands you food and says one Tangkhul word.', 'Host taps "Pick a person": a random name, one situation per person. That person guesses what the word means: A, B or C.',
     'Host reveals the answer. Everyone repeats the word out loud.', 'Then a TWIST appears to make it funnier!',
     'Points: +2 right answer, +2 pronunciation, +3 for the most entertaining attempt.'] },
+  { id: 'blank', emoji: '✍️', name: 'Fill in the Blank', blurb: 'Type your own answer and send it.', how: [] },
 ];
 const LETTERS = ['A', 'B', 'C'];
 
@@ -55,7 +57,7 @@ export default function TangkhulGame({ initialPlayers = [] }: { initialPlayers?:
     const saved = load<{ name: string; score: number }[]>('players');
     if (Array.isArray(saved) && saved.length) setPlayers(saved.filter((p) => p && typeof p.name === 'string' && Number.isFinite(p.score)));
     const m = load<Mode>('mode');
-    if (m === 'challenge' || m === 'survival') setMode(m);
+    if (m === 'challenge' || m === 'survival' || m === 'blank') setMode(m);
     setReady(true);
   }, []);
   useEffect(() => { if (ready) save('players', players); }, [players, ready]);
@@ -74,7 +76,7 @@ export default function TangkhulGame({ initialPlayers = [] }: { initialPlayers?:
       </div>
       {players.length > 0 && (
         <div className="vacts">
-          <button type="button" className="ghost" onClick={() => { if (confirm('Set every score back to 0 and restart the games?')) { setPlayers(players.map((p) => ({ ...p, score: 0 }))); try { localStorage.removeItem(`${KEY}:progress:challenge`); localStorage.removeItem(`${KEY}:progress:survival`); } catch { /* ignore */ } setMode(null); } }}>↺ Reset scores</button>
+          <button type="button" className="ghost" onClick={() => { if (confirm('Set every score back to 0 and restart the games?')) { setPlayers(players.map((p) => ({ ...p, score: 0 }))); try { localStorage.removeItem(`${KEY}:progress:challenge`); localStorage.removeItem(`${KEY}:progress:survival`); localStorage.removeItem(`${KEY}:progress:blank`); } catch { /* ignore */ } setMode(null); } }}>↺ Reset scores</button>
         </div>
       )}
       {players.map((p, i) => (
@@ -118,6 +120,20 @@ export default function TangkhulGame({ initialPlayers = [] }: { initialPlayers?:
 }
 
 function Play({ mode, how, players }: { mode: Mode; how: string[]; players: string[] }) {
+  return mode === 'blank' ? <BlankPlay /> : <CardPlay mode={mode} how={how} players={players} />;
+}
+
+/** Fill in the blank: each person types their own answer and sends it once. Answers are saved in the DB; the admin reads them in the dashboard. */
+function BlankPlay() {
+  return (
+    <div className="vres vgap">
+      <div className="eyebrow">Fill in the blank</div>
+      <SentenceForm />
+    </div>
+  );
+}
+
+function CardPlay({ mode, how, players }: { mode: Mode; how: string[]; players: string[] }) {
   const cards = useMemo(() => deck(mode), [mode]);
   const [i, setI] = useState(0);
   const [pick_, setPick] = useState<number | null>(null);
