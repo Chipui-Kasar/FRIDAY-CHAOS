@@ -127,3 +127,37 @@ h1 { background: linear-gradient(90deg, var(--text), var(--brand) 60%, var(--bra
 .langbtn { display: block; margin: 0 auto 14px; padding: 8px 16px; font-size: .85rem; border-radius: 99px; color: var(--brand); background: color-mix(in srgb, var(--brand) 12%, transparent); border: 1.5px solid color-mix(in srgb, var(--brand) 40%, transparent); }
 .langbtn:hover { opacity: 1; background: color-mix(in srgb, var(--brand) 20%, transparent); }
 
+
+/* ---- tangkhul games ---- */
+.vgames { display: grid; gap: 10px; }
+.vgame { display: flex; align-items: center; gap: 14px; text-align: left; color: var(--text); font-weight: 500; background: var(--card); border: 1.5px solid var(--line); padding: 12px 14px; }
+.vgame:hover { opacity: 1; border-color: var(--brand); transform: translateY(-1px); }
+.vgame b { display: block; font-size: .98rem; }
+.vgame small { display: block; margin-top: 2px; font-size: .8rem; font-weight: 400; color: var(--muted); }
+.vgemoji { font-size: 1.9rem; line-height: 1; flex: none; }
+.vres { text-align: center; }
+.vgap { margin-top: 14px; }
+.vbig { font-size: 3.2rem; line-height: 1.1; }
+.vtitle { font-size: 1.4rem; font-weight: 800; margin: 4px 0 8px; }
+.vtext { margin: 0 0 12px; font-size: .95rem; color: var(--muted); }
+.vopts { display: grid; gap: 8px; }
+.vopt { text-align: left; font-weight: 500; font-size: 1rem; color: var(--text); background: var(--card); border: 1.5px solid var(--line); padding: 12px 14px; }
+.vopt:hover { opacity: 1; border-color: var(--brand); }
+.vopt.picked { border-color: var(--brand); background: color-mix(in srgb, var(--brand) 14%, var(--card)); }
+.vopt.right { border-color: var(--ok); background: color-mix(in srgb, var(--ok) 16%, var(--card)); }
+.vopt.dim { opacity: .45; }
+.vtopic { text-align: left; margin: 14px 0; padding: 14px 16px; border-radius: 14px; background: var(--card); border: 1px solid var(--line); border-left: 4px solid var(--brand2); }
+.vtopic h3 { margin: 0 0 6px; font-size: .75rem; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; color: var(--brand); }
+.vtopic p { margin: 0; font-size: 1.05rem; font-weight: 600; line-height: 1.45; }
+.vtopic .tksay { margin-top: 6px; font-weight: 400; color: var(--muted); }
+.vtwist { margin-top: 14px; padding: 12px 14px; text-align: left; border-radius: 12px; color: var(--warn); background: color-mix(in srgb, var(--warn) 12%, transparent); border: 1px solid color-mix(in srgb, var(--warn) 35%, transparent); }
+.vacts { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; }
+.tkword { font-size: clamp(2.2rem, 8vw, 4rem); font-weight: 800; letter-spacing: -.02em; margin: 10px 0; background: linear-gradient(135deg, var(--brand), var(--brand2)); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.tkboard { display: grid; gap: 8px; }
+.tkadd { display: flex; gap: 8px; }
+.tkplayer { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; padding: 8px 12px; border: 1px solid var(--line); border-radius: 12px; }
+.tkplayer b { flex: 1 1 120px; }
+.tkscore { font-size: 1.4rem; font-weight: 800; min-width: 2ch; text-align: right; }
+.tkhow { text-align: left; max-width: 480px; margin: 0 auto 14px; padding-left: 1.4em; font-size: 1.02rem; line-height: 1.6; }
+.tkhow li { margin-bottom: 6px; }
+.tkturn { margin: 6px 0; padding: 8px 14px; border-radius: 99px; display: inline-block; font-size: 1.1rem; background: color-mix(in srgb, var(--brand) 12%, transparent); border: 1px solid color-mix(in srgb, var(--brand) 30%, transparent); }
