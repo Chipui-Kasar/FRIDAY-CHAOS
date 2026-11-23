@@ -87,6 +87,8 @@ export default function Admin() {
           <button className={tab === 'people' ? 'on' : ''} onClick={() => setTab('people')}>Participants</button>
           <button className={tab === 'sentences' ? 'on' : ''} onClick={() => setTab('sentences')}>Sentences</button>
           <button className={tab === 'logs' ? 'on' : ''} onClick={() => setTab('logs')}>Access logs</button>
+          <a className="ghost" href="/look">👀 Look</a>
+          <a className="ghost" href="/tangkhul">🏔️ Tangkhul</a>
           <button className="ghost" onClick={load}>↻</button>
         </div>
       </div>

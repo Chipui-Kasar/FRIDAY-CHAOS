@@ -168,3 +168,16 @@ h1 { background: linear-gradient(90deg, var(--text), var(--brand) 60%, var(--bra
 .sentline { font-size: 1.15rem; font-weight: 600; line-height: 2.2; margin: 0; }
 .sentline input { display: inline-block; width: 9.5em; padding: 6px 10px; font-size: 1rem; margin: 0 2px; text-align: center; }
 .muted{color:var(--muted)}
+
+/* ---- look carefully ---- */
+.lkclock { font-size: clamp(3rem, 10vw, 5rem); font-weight: 800; font-variant-numeric: tabular-nums; margin: 4px 0 10px; background: linear-gradient(135deg, var(--brand), var(--brand2)); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.lkclock.hurry { background: none; color: var(--bad); }
+.lkgrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(112px, 1fr)); gap: 10px; }
+.lkitem { display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 10px 6px; border-radius: 14px; border: 1px solid var(--line); background: var(--card); font-weight: 600; font-size: .9rem; }
+.lkitem.new { border-color: var(--ok); background: color-mix(in srgb, var(--ok) 16%, var(--card)); box-shadow: 0 0 0 3px color-mix(in srgb, var(--ok) 25%, transparent); }
+.lke { font-size: 2.4rem; line-height: 1.1; }
+.tabs a.ghost { display: inline-flex; align-items: center; text-decoration: none; color: var(--text); border: 1.5px solid var(--line); border-radius: 12px; padding: 8px 14px; font-weight: 600; font-size: .85rem; }
+.tabs a.ghost:hover { border-color: var(--brand); }
+.lkitem { position: relative; }
+.lkletter { position: absolute; top: 6px; left: 8px; font-size: 1.2rem; color: var(--brand); }
+.lkword { margin: 18px 0 6px; font-size: clamp(2rem, 8vw, 3.6rem); font-weight: 800; letter-spacing: .25em; text-transform: uppercase; background: linear-gradient(135deg, var(--brand), var(--brand2)); -webkit-background-clip: text; background-clip: text; color: transparent; }
