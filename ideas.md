@@ -1,32 +1,5 @@
-2. WRONG ANSWERS ONLY
-   Duration: 5–7 minutes
+# BUILD A HUMAN MACHINE
 
-Rules:
-
-- Participants must give the funniest and most ridiculous WRONG answer.
-- Answers can be in Tamil, English or any language.
-- No correct answers allowed!
-- The funniest answer wins.
-  Questions:
-
-1. Why do we have managers?
-2. Why does Monday exist?
-3. Why do we need passwords?
-4. Why do people get married?
-5. Why do we attend meetings?
-6. Why does the printer jam?
-7. Why do we have holidays?
-8. What is the purpose of a computer mouse?
-9. Why does Microsoft Teams freeze?
-10. Why do employees say "Noted"?
-11. Why do we need office chairs?
-12. Why do people set alarms but never wake up?
-13. Why do we need traffic signals?
-14. Why do people take selfies?
-15. Why is salary credited only once a month?
-    Bonus challenge: After someone gives a wrong answer, ask another participant to explain why that answer is actually correct!
-
-16. BUILD A HUMAN MACHINE
     Duration: 8–10 minutes
 
 Rules:
@@ -58,8 +31,9 @@ Rules:
 
 Winner: The funniest and most creative human machine.
 
-4. 30-SECOND MEMORY HEIST
-   Duration: 7–10 minutes
+# 30-SECOND MEMORY HEIST
+
+Duration: 7–10 minutes
 
 Rules:
 
@@ -95,7 +69,8 @@ General hosting instructions:
 - Keep rounds short and energetic.
 - Encourage everyone to participate rather than allowing only the fastest participants to answer.
 
-TANGKHUL LANGUAGE CHALLENGE – CAN YOU SPEAK TANGKHUL?
+# TANGKHUL LANGUAGE CHALLENGE – CAN YOU SPEAK TANGKHUL?
+
 Duration: 5–7 minutes
 
 Objective: Introduce colleagues to the Tangkhul language through a fun guessing and pronunciation game.
@@ -112,7 +87,6 @@ Rules:
 
 - Round 1: 5 easy everyday words.
 - Round 2: 5 commonly used phrases.
-- Round 3: 3 difficult words.
   Bonus Challenge: Ask participants to use a newly learned Tangkhul word in a funny English sentence.
 
 Scoring:
@@ -121,8 +95,9 @@ Scoring:
 - Good pronunciation: 2 points.
 - Funniest sentence: 3 bonus points.
 
-6. TANGKHUL vs TAMIL – LANGUAGE COMPARISON CHALLENGE
-   Duration: 5–7 minutes
+# TANGKHUL vs TAMIL – LANGUAGE COMPARISON CHALLENGE
+
+Duration: 5–7 minutes
 
 Objective: Explore similarities and differences between Tangkhul and Tamil through an entertaining language challenge.
 
@@ -148,8 +123,9 @@ Scoring:
 - Correct pronunciation: 2 points.
 - Best language comparison: 3 bonus points.
 
-7. TANGKHUL SURVIVAL TEST
-   Duration: 8–10 minutes
+# TANGKHUL SURVIVAL TEST
+
+Duration: 8–10 minutes
 
 Objective: Test how well participants can communicate in Tangkhul through funny real-life situations.
 
