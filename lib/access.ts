@@ -155,7 +155,7 @@ export const revokeDeviceAccess = (db: Db, id: string, meta: Meta) =>
 export async function adminOverview(db: Db) {
   return db.query(
     `SELECT p.id, p.name, p.email,
-            a.claimed_at, a.revealed_at,
+            a.claimed_at, a.revealed_at, a.content AS assignment,
             d.created_at AS registered_at, d.last_accessed_at, d.revoked_at, d.user_agent, d.ip_address,
             CASE WHEN d.id IS NULL THEN 'unclaimed'
                  WHEN d.revoked_at IS NULL THEN 'active'

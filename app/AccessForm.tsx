@@ -52,7 +52,7 @@ export default function AccessForm() {
     <form onSubmit={submit}>
       <div className="eyebrow">SharePoint Designs presents</div>
       <h1>{EVENT_NAME}</h1>
-      <p className="sub">Enter your email to see your assignment.</p>
+      <p className="sub">Enter your email to get your extempore topic.</p>
       <p className="tag" key={tag} aria-live="off">💡 {TAGLINES[tag]}</p>
       <label htmlFor="email">Email</label>
       <input id="email" type="email" inputMode="email" autoComplete="email" autoFocus required

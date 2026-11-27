@@ -3,10 +3,9 @@ import { after } from "next/server";
 import { getSentence, logEvent, loadSession } from "../lib/access";
 import { getDb } from "../lib/db";
 import { DEVICE_COOKIE } from "../lib/security";
-import { EVENT_EMOJI, emojiFor } from "../lib/brand";
+import { EVENT_EMOJI } from "../lib/brand";
 import AccessForm from "./AccessForm";
 import Reveal from "./Reveal";
-import Rules from "./Rules";
 import SentenceForm from "./SentenceForm";
 import Waiting from "./Waiting";
 import Watch from "./Watch";
@@ -46,8 +45,8 @@ export default async function Home() {
           <h1>Hi {session.participant.name.split(" ")[0]}!</h1>
           <p className="sub">
             {session.locked
-              ? "Your assignment is locked 🔒"
-              : "Your Friday assignment"}{" "}
+              ? "Your topic is locked 🔒"
+              : "Your extempore topic"}{" "}
             <span className="chip">Shared with: Only you</span>
           </p>
           {session.locked ? (
@@ -60,10 +59,10 @@ export default async function Home() {
               <Watch />
               <Reveal
                 textTa={session.assignmentTa}
-                emoji={emojiFor((session.assignment ?? "").split("\n")[0])}
+                emoji={EVENT_EMOJI}
                 text={
                   session.assignment ??
-                  "Nothing assigned yet — check back soon."
+                  "No topic yet. Check back soon."
                 }
               />
             </>
@@ -75,9 +74,8 @@ export default async function Home() {
                 : null
             }
           />
-          <Rules />
           <p className="fine">
-            Keep it secret 🤫 · Opened on this device only
+            Keep it to yourself till your turn 🤫 · Opened on this device only
             <br />
             Last modified by: Kasar · Version 3.8
           </p>

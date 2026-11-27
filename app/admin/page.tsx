@@ -2,7 +2,7 @@
 import { EVENT_NAME } from '../../lib/brand';
 import { FormEvent, useCallback, useEffect, useState } from 'react';
 
-type Row = { id: string; name: string; email: string; status: string; claimed_at: string | null; revealed_at: string | null; registered_at: string | null; last_accessed_at: string | null; user_agent: string | null; ip_address: string | null };
+type Row = { id: string; assignment: string | null; name: string; email: string; status: string; claimed_at: string | null; revealed_at: string | null; registered_at: string | null; last_accessed_at: string | null; user_agent: string | null; ip_address: string | null };
 type Log = { id: string; created_at: string; event: string; success: boolean; detail: string | null; email_attempted: string | null; participant_name: string | null; ip_address: string | null };
 type Settings = { revealOpen: boolean; isOpen: boolean; revealAtMs: number | null; serverNowMs: number };
 const fmt = (s: string | null) => (s ? new Date(s).toLocaleString() : '—');
@@ -18,10 +18,12 @@ export default function Admin() {
   const [err, setErr] = useState('');
   const [settings, setSettings] = useState<Settings | null>(null);
   const [when, setWhen] = useState('');
+  const [picked, setPicked] = useState<Row | null>(null);
 
   const load = useCallback(async () => {
     const [o, l, sn] = await Promise.all([fetch('/api/admin/overview'), fetch('/api/admin/logs'), fetch('/api/admin/sentences')]);
     if (o.status === 401 || o.status === 503) { setAuthed(false); if (o.status === 503) setErr('Admin is not configured on the server.'); return; }
+    if (!o.ok || !l.ok) { setErr('Could not load data (server error). Check the database connection and try again.'); return; }
     const od = await o.json();
     setRows(od.participants);
     setSettings(od.settings);
@@ -97,7 +99,7 @@ export default function Admin() {
           <div className="row">
             <span>Reveal status:</span>
             <span className={`state ${settings.isOpen ? 'open' : 'locked'}`}>
-              {settings.isOpen ? '🔓 OPEN: participants can see their characters'
+              {settings.isOpen ? '🔓 OPEN: participants can see their topics'
                 : settings.revealAtMs ? `🔒 LOCKED: opens automatically ${new Date(settings.revealAtMs).toLocaleString()}` : '🔒 LOCKED: waiting for you'}
             </span>
           </div>
@@ -115,10 +117,10 @@ export default function Admin() {
       )}
       <div className="tbl">
         {tab === 'people' ? (
-          <table><thead><tr><th>Name</th><th>Email</th><th>Status</th><th>Character</th><th>Registered</th><th>Last access</th><th>Device</th><th /></tr></thead>
+          <table><thead><tr><th>Name</th><th>Email</th><th>Status</th><th>Topic</th><th>Registered</th><th>Last access</th><th>Device</th><th /></tr></thead>
             <tbody>{rows.map((r) => (
               <tr key={r.id}>
-                <td>{r.name}</td><td>{r.email}</td>
+                <td><button className="ghost" style={{ padding: 0, border: 0, background: 'none', color: 'inherit', font: 'inherit', textDecoration: 'underline dotted', cursor: 'pointer' }} onClick={() => setPicked(r)}>{r.name}</button></td><td>{r.email}</td>
                 <td><span className={`pill ${r.status}`}>{r.status.replace('_', ' ')}</span></td>
                 <td>{settings?.isOpen ? <span className="ok">🔓 all open</span> : r.revealed_at ? <span className="ok">🔓 revealed</span> : <span className="muted">🔒 hidden</span>}</td>
                 <td>{fmt(r.registered_at)}</td><td>{fmt(r.last_accessed_at)}</td>
@@ -146,6 +148,18 @@ export default function Admin() {
                 <td>{l.participant_name ?? '—'}</td><td>{l.email_attempted ?? '—'}</td><td>{l.detail ?? ''}</td><td>{l.ip_address ?? '—'}</td></tr>))}</tbody></table>
         )}
       </div>
-    </div></main>
+    </div>
+    {picked && (
+      <div onClick={() => setPicked(null)} style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,.45)', display: 'grid', placeItems: 'center', zIndex: 50, padding: 16 }}>
+        <div role="dialog" aria-modal="true" onClick={(e) => e.stopPropagation()} style={{ background: '#fff', color: '#1b1b1b', borderRadius: 12, padding: '20px 24px', maxWidth: 480, width: '100%', maxHeight: '80vh', overflow: 'auto', boxShadow: '0 12px 40px rgba(0,0,0,.3)' }}>
+          <h2 style={{ margin: '0 0 2px' }}>{picked.name}</h2>
+          <p className="muted" style={{ margin: '0 0 14px' }}>{picked.email}</p>
+          <strong style={{ fontSize: '.72rem', textTransform: 'uppercase', letterSpacing: '.05em', opacity: .6 }}>Assignment</strong>
+          <p style={{ whiteSpace: 'pre-wrap', margin: '4px 0 18px' }}>{picked.assignment || 'No assignment'}</p>
+          <button onClick={() => setPicked(null)}>Close</button>
+        </div>
+      </div>
+    )}
+    </main>
   );
 }

@@ -1,14 +1,15 @@
 // Change the event name here; the whole app picks it up.
-export const EVENT_NAME = 'Undercover Friday';
-export const EVENT_EMOJI = '🕵️';
+export const EVENT_NAME = 'Extempore Friday';
+export const EVENT_EMOJI = '🎤';
 
-// Shown to everyone AFTER they reveal their character. Edit freely (not secret).
+// Shown to everyone, before and after their topic is revealed. Edit freely (not secret).
 export const INSTRUCTIONS_TITLE = 'How to play';
 export const INSTRUCTIONS: string[] = [
-  'Stay in character when it’s your turn: voice, attitude, everything.',
-  'Never say your character out loud. Let people guess it from how you act.',
-  'Don’t show your screen to anyone, and keep it secret until the reveal.',
-  'Be creative, be funny, and stay kind. It’s all in good fun.',
+  'When the host calls your name, your topic unlocks. No peeking early, no prep.',
+  'Stand up and speak on it for about one minute. Start talking straight away.',
+  'Go all in: be dramatic, be funny, and commit to the bit. Keep the “say things like” lines handy if you freeze.',
+  'No stopping, no “umm” marathons. If you run dry, make something up.',
+  'Cheer for everyone, laugh with people, never at them. It’s all in good fun.',
 ];
 
 // Picks an emoji for a character by keyword. First match wins; edit/add freely.

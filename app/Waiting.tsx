@@ -10,7 +10,7 @@ function parts(ms: number) {
 const JOKES = [
   'Buffering… like a SharePoint list view with 5,000 items.',
   'Waiting for the host to approve your request (it’s in the workflow).',
-  'Your character is being provisioned. This may take a moment.',
+  'Your speech topic is being provisioned. This may take a moment.',
   'Indexing the fun. Search crawl in progress…',
 ];
 
@@ -52,7 +52,7 @@ export default function Waiting({ revealAtMs, serverNowMs }: { revealAtMs: numbe
     <div className="waiting" role="status" aria-live="polite">
       {left ? (
         <>
-          <div className="wlabel">Your character unlocks in</div>
+          <div className="wlabel">Your topic unlocks in</div>
           <div className="clock">
             {left.d > 0 && <div><b>{left.d}</b><span>days</span></div>}
             {(left.d > 0 || left.h > 0) && <div><b>{pad(left.h)}</b><span>hrs</span></div>}

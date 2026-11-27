@@ -155,7 +155,7 @@ describe('admin', () => {
     expect((await x.overview()).status).toBe(401);
   });
 
-  it('shows participants, statuses, times and logs without exposing assignment content', async () => {
+  it('shows participants, statuses, times and logs including each assignment', async () => {
     await new Browser().access(A.email);
     const host = new Browser('10.9.9.9');
     await host.adminLogin();
@@ -165,7 +165,7 @@ describe('admin', () => {
     expect(ada.status).toBe('active');
     expect(ada.registered_at && ada.last_accessed_at && ada.claimed_at).toBeTruthy();
     expect(bob.status).toBe('unclaimed');
-    expect(JSON.stringify(json)).not.toContain(A.assignment);
+    expect(ada.assignment).toBe(A.assignment);
     expect((await host.logs()).json.logs.some((l: any) => l.event === 'register' && l.success)).toBe(true);
   });
 
