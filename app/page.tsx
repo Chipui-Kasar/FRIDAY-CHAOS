@@ -70,7 +70,7 @@ export default async function Home() {
           <SentenceForm
             saved={
               sentence
-                ? { blank1: sentence.blank1, blank2: sentence.blank2 }
+                ? { blank1: sentence.blank1, blank2: sentence.blank2, blank3: sentence.blank3 }
                 : null
             }
           />

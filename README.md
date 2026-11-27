@@ -1,4 +1,4 @@
-# Extempore Friday portal
+# Speak, Look & Learn portal
 
 Private game portal for ~17 known participants. Enter your email → your assignment is bound to **the first device** that claims it. No OTP, no email verification, no magic links.
 

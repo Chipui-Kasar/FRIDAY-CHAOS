@@ -2,8 +2,8 @@
 import { useEffect, useState } from 'react';
 
 /** One-shot Tangkhul sentence. Deliberately gives no hint about what the blanks mean: the surprise is the point. */
-export default function SentenceForm({ saved }: { saved?: { blank1: string; blank2: string } | null }) {
-  const [answer, setAnswer] = useState<{ blank1: string; blank2: string } | null>(saved ?? null);
+export default function SentenceForm({ saved }: { saved?: { blank1: string; blank2: string; blank3?: string | null } | null }) {
+  const [answer, setAnswer] = useState<{ blank1: string; blank2: string; blank3?: string | null } | null>(saved ?? null);
   // `saved` omitted => load this device's saved answer ourselves (used on the host screen). 'out' = not a registered participant device.
   const [state, setState] = useState<'ready' | 'loading' | 'out'>(saved === undefined ? 'loading' : 'ready');
   useEffect(() => {
@@ -15,16 +15,17 @@ export default function SentenceForm({ saved }: { saved?: { blank1: string; blan
   }, [saved]);
   const [a, setA] = useState('');
   const [b, setB] = useState('');
+  const [c, setC] = useState('');
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState('');
 
   async function send(e: React.FormEvent) {
     e.preventDefault();
-    if (busy || !a.trim() || !b.trim()) return;
+    if (busy || !a.trim() || !b.trim() || !c.trim()) return;
     if (!confirm('Send this answer? You cannot change it afterwards.')) return;
     setBusy(true); setErr('');
     try {
-      const r = await fetch('/api/sentence', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ blank1: a, blank2: b }) });
+      const r = await fetch('/api/sentence', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ blank1: a, blank2: b, blank3: c }) });
       const d = await r.json();
       if (r.ok || r.status === 409) setAnswer(d.answer); else setErr(d.error ?? 'Something went wrong. Try again.');
     } catch { setErr('Network problem. Try again.'); } finally { setBusy(false); }
@@ -37,7 +38,7 @@ export default function SentenceForm({ saved }: { saved?: { blank1: string; blan
         <p className="fine">This device isn&apos;t signed in as a participant. Open the home page on your own device and enter your email to answer.</p>
       ) : answer ? (
         <>
-          <p className="sentline">Iwui aming <b>{answer.blank1}</b> hoya. I <b>{answer.blank2}</b> naona.</p>
+          <p className="sentline">Iwui aming <b>{answer.blank1}</b> hoya. I <b>{answer.blank2}</b> naona.{answer.blank3 && <> Laga I <b>{answer.blank3}</b> li leishiya.</>}</p>
           <p className="fine" style={{ marginTop: 6 }}>✅ Sent. It can&apos;t be changed now. Wait for the host to read it out! 😄</p>
         </>
       ) : (
@@ -45,9 +46,10 @@ export default function SentenceForm({ saved }: { saved?: { blank1: string; blan
           <p className="sentline">
             Iwui aming <input aria-label="first blank" value={a} maxLength={100} onChange={(e) => setA(e.target.value)} placeholder="_____" /> hoya.
             {' '}I <input aria-label="second blank" value={b} maxLength={100} onChange={(e) => setB(e.target.value)} placeholder="_____" /> naona.
+            {' '}Laga I <input aria-label="third blank" value={c} maxLength={100} onChange={(e) => setC(e.target.value)} placeholder="_____" /> li leishiya.
           </p>
-          <p className="fine" style={{ marginTop: 6 }}>Fill both blanks with whatever you think fits. You can send only once.</p>
-          <button type="submit" className="full" disabled={busy || !a.trim() || !b.trim()}>{busy ? 'Sending…' : 'Send my answer'}</button>
+          <p className="fine" style={{ marginTop: 6 }}>Fill all the blanks with whatever you think fits. You can send only once.</p>
+          <button type="submit" className="full" disabled={busy || !a.trim() || !b.trim() || !c.trim()}>{busy ? 'Sending…' : 'Send my answer'}</button>
           {err && <div className="msg" role="alert">{err}</div>}
         </form>
       )}

@@ -94,6 +94,8 @@ CREATE TABLE IF NOT EXISTS sentence_responses (
   blank2         TEXT NOT NULL CHECK (char_length(btrim(blank2)) BETWEEN 1 AND 100),
   created_at     TIMESTAMPTZ NOT NULL DEFAULT now()
 );
+ALTER TABLE sentence_responses ADD COLUMN IF NOT EXISTS blank3 TEXT
+  CHECK (blank3 IS NULL OR char_length(btrim(blank3)) BETWEEN 1 AND 100);
 
 CREATE OR REPLACE FUNCTION sentence_responses_immutable() RETURNS trigger AS $$
 BEGIN

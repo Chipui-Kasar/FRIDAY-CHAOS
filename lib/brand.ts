@@ -1,6 +1,6 @@
 // Change the event name here; the whole app picks it up.
-export const EVENT_NAME = 'Extempore Friday';
-export const EVENT_EMOJI = '🎤';
+export const EVENT_NAME = 'Speak, Look & Learn';
+export const EVENT_EMOJI = '🎉';
 
 // Shown to everyone, before and after their topic is revealed. Edit freely (not secret).
 export const INSTRUCTIONS_TITLE = 'How to play';

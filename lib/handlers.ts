@@ -92,7 +92,7 @@ const cleanBlank = (v: unknown): string | null => {
   return t.length >= 1 && t.length <= 100 ? t : null;
 };
 
-/** GET /api/sentence: this person's saved answer (or null). POST { blank1, blank2 }: save it ONCE; later edits are rejected. */
+/** GET /api/sentence: this person's saved answer (or null). POST { blank1, blank2, blank3 }: save it ONCE; later edits are rejected. */
 export async function handleSentence(req: Request) {
   const db = getDb();
   const s = await loadSession(db, readCookie(req, DEVICE_COOKIE));
@@ -101,9 +101,10 @@ export async function handleSentence(req: Request) {
   const body = await readJson(req);
   const blank1 = cleanBlank(body?.blank1);
   const blank2 = cleanBlank(body?.blank2);
-  if (!blank1 || !blank2) return json({ error: 'Please fill in both blanks (up to 100 characters each).' }, 400);
+  const blank3 = cleanBlank(body?.blank3);
+  if (!blank1 || !blank2 || !blank3) return json({ error: 'Please fill in all the blanks (up to 100 characters each).' }, 400);
   if (!(await rateLimit(db, `sentence:${s.participant.id}`, 10, LIMITS.windowSec))) return json({ error: RATE_MESSAGE }, 429);
-  const saved = await submitSentence(db, s.participant.id, blank1, blank2);
+  const saved = await submitSentence(db, s.participant.id, blank1, blank2, blank3);
   if (!saved) return json({ error: 'You have already sent your answer. It cannot be changed.', answer: await getSentence(db, s.participant.id) }, 409);
   return json({ ok: true, answer: saved });
 }

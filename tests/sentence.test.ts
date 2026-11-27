@@ -18,29 +18,30 @@ beforeEach(async () => {
 
 describe('tangkhul sentence', () => {
   it('requires a signed-in device', async () => {
-    expect((await new Browser().sentence({ blank1: 'x', blank2: 'y' })).status).toBe(401);
+    expect((await new Browser().sentence({ blank1: 'x', blank2: 'y', blank3: 'z' })).status).toBe(401);
   });
 
   it('saves one answer, trims it, and rejects empty or oversize input', async () => {
-    expect((await ada.sentence({ blank1: '', blank2: 'y' })).status).toBe(400);
-    expect((await ada.sentence({ blank1: 'x'.repeat(101), blank2: 'y' })).status).toBe(400);
-    expect((await ada.sentence({ blank1: 1, blank2: 'y' })).status).toBe(400);
-    const r = await ada.sentence({ blank1: '  Pizza   Man ', blank2: 'Mars' });
+    expect((await ada.sentence({ blank1: '', blank2: 'y', blank3: 'z' })).status).toBe(400);
+    expect((await ada.sentence({ blank1: 'x'.repeat(101), blank2: 'y', blank3: 'z' })).status).toBe(400);
+    expect((await ada.sentence({ blank1: 'x', blank2: 'y' })).status).toBe(400); // third blank is required
+    expect((await ada.sentence({ blank1: 1, blank2: 'y', blank3: 'z' })).status).toBe(400);
+    const r = await ada.sentence({ blank1: '  Pizza   Man ', blank2: 'Mars', blank3: 'Sun' });
     expect(r.status).toBe(200);
-    expect(r.json.answer).toMatchObject({ blank1: 'Pizza Man', blank2: 'Mars' });
+    expect(r.json.answer).toMatchObject({ blank1: 'Pizza Man', blank2: 'Mars', blank3: 'Sun' });
     expect((await ada.sentence()).json.answer).toMatchObject({ blank1: 'Pizza Man' });
   });
 
   it('cannot be edited after sending (API and database)', async () => {
-    await ada.sentence({ blank1: 'First', blank2: 'One' });
-    const again = await ada.sentence({ blank1: 'Second', blank2: 'Two' });
+    await ada.sentence({ blank1: 'First', blank2: 'One', blank3: 'Uno' });
+    const again = await ada.sentence({ blank1: 'Second', blank2: 'Two', blank3: 'Dos' });
     expect(again.status).toBe(409);
-    expect(again.json.answer).toMatchObject({ blank1: 'First', blank2: 'One' });
+    expect(again.json.answer).toMatchObject({ blank1: 'First', blank2: 'One', blank3: 'Uno' });
     await expect(db.query(`UPDATE sentence_responses SET blank1 = 'hack'`)).rejects.toThrow();
   });
 
   it('is private per person and visible to the admin only', async () => {
-    await ada.sentence({ blank1: 'Potato', blank2: 'Moon' });
+    await ada.sentence({ blank1: 'Potato', blank2: 'Moon', blank3: 'Star' });
     expect((await bob.sentence()).json.answer).toBeNull();
     expect((await bob.adminSentences()).status).toBe(401);
     const r = await host.adminSentences();
@@ -51,7 +52,7 @@ describe('tangkhul sentence', () => {
   });
 
   it('is deleted with the participant', async () => {
-    await ada.sentence({ blank1: 'a', blank2: 'b' });
+    await ada.sentence({ blank1: 'a', blank2: 'b', blank3: 'c' });
     await db.query(`DELETE FROM participants WHERE id = $1`, [await idOf(db, A.email)]);
     expect(await db.query(`SELECT 1 FROM sentence_responses`)).toHaveLength(0);
   });

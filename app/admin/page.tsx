@@ -13,7 +13,7 @@ export default function Admin() {
   const [tab, setTab] = useState<'people' | 'logs' | 'sentences'>('people');
   const [rows, setRows] = useState<Row[]>([]);
   const [logs, setLogs] = useState<Log[]>([]);
-  const [sentences, setSentences] = useState<{ id: string; name: string; blank1: string | null; blank2: string | null; created_at: string | null }[]>([]);
+  const [sentences, setSentences] = useState<{ id: string; name: string; blank1: string | null; blank2: string | null; blank3: string | null; created_at: string | null }[]>([]);
   const [pw, setPw] = useState('');
   const [err, setErr] = useState('');
   const [settings, setSettings] = useState<Settings | null>(null);
@@ -136,10 +136,10 @@ export default function Admin() {
                 </div></td>
               </tr>))}</tbody></table>
         ) : tab === 'sentences' ? (
-          <table><thead><tr><th>Name</th><th>Iwui aming … hoya.</th><th>I … naona.</th><th>Sent</th></tr></thead>
+          <table><thead><tr><th>Name</th><th>Iwui aming … hoya.</th><th>I … naona.</th><th>Laga I … li leishiya</th><th>Sent</th></tr></thead>
             <tbody>{sentences.map((r) => (
               <tr key={r.id}><td>{r.name}</td>
-                <td>{r.blank1 ?? <span className="muted">not sent yet</span>}</td><td>{r.blank2 ?? '—'}</td><td>{fmt(r.created_at)}</td></tr>))}</tbody></table>
+                <td>{r.blank1 ?? <span className="muted">not sent yet</span>}</td><td>{r.blank2 ?? '—'}</td><td>{r.blank3 ?? '—'}</td><td>{fmt(r.created_at)}</td></tr>))}</tbody></table>
         ) : (
           <table><thead><tr><th>Time</th><th>Event</th><th>Result</th><th>Participant</th><th>Email tried</th><th>Detail</th><th>IP</th></tr></thead>
             <tbody>{logs.map((l) => (
