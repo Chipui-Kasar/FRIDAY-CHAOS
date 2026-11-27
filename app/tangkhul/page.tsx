@@ -9,7 +9,7 @@ export const dynamic = 'force-dynamic';
 
 /**
  * Public: Fill in the blank (each person types their own answer).
- * Admin only: Word Guess and Survival Test + the scoreboard. Non-admins never get that code or the participant names,
+ * Admin only: Learn Tangkhul + the scoreboard. Non-admins never get that code or the participant names,
  * because the admin game is a separate client component that is only rendered for an admin session.
  */
 export default async function Page() {

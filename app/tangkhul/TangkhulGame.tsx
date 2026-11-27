@@ -1,19 +1,14 @@
 'use client';
 import { useEffect, useMemo, useState } from 'react';
 import SentenceForm from '../SentenceForm';
-import { BONUS, CHALLENGE, GOOD, SURVIVAL, STYLES, TRY, options, pick, type Item } from '../../lib/tangkhul';
+import { BONUS, GOOD, SURVIVAL, STYLES, TRY, options, pick, type Item } from '../../lib/tangkhul';
 
-type Mode = 'challenge' | 'survival' | 'blank';
+type Mode = 'survival' | 'blank';
 const MODES: { id: Mode; emoji: string; name: string; blurb: string; how: string[] }[] = [
-  { id: 'challenge', emoji: '🗣️', name: 'Word Guess', blurb: 'See a Tangkhul word. Guess what it means.', how: [
-    'A Tangkhul word appears on the screen.', 'Host taps "Pick a person": a random name is chosen, and nobody is picked twice until everyone has had a turn. Each person answers only ONE word. (The others can help or shout!)', 'The player guesses the meaning: A, B or C. Tamil or English is fine.',
-    'Host taps "Reveal the answer".', 'Someone says the word out loud. Tap "Pronounce it!" for a funny style to say it in.',
-    'Give points: +2 for the right meaning, +2 for good pronunciation.', 'At the end: make a funny English sentence with a new word (+3 for the best).'] },
-  { id: 'survival', emoji: '🏔️', name: 'Survival Test', blurb: 'A funny situation with a Tangkhul word. What does it mean?', how: [
+  { id: 'survival', emoji: '📖', name: 'Learn Tangkhul', blurb: 'Learn useful Tangkhul words through funny situations.', how: [
     'The screen shows a situation, for example: a village auntie hands you food and says one Tangkhul word.', 'Host taps "Pick a person": a random name, one situation per person. That person guesses what the word means: A, B or C.',
     'Host reveals the answer. Everyone repeats the word out loud.', 'Then a TWIST appears to make it funnier!',
     'Points: +2 right answer, +2 pronunciation, +3 for the most entertaining attempt.'] },
-  { id: 'blank', emoji: '✍️', name: 'Fill in the Blank', blurb: 'Type your own answer and send it.', how: [] },
 ];
 const LETTERS = ['A', 'B', 'C'];
 
@@ -41,9 +36,8 @@ function save(k: string, v: unknown) {
 }
 
 type Flat = { round: string; item: Item; scenario?: { title: string; situation: string; twist: string } };
-function deck(mode: Mode): Flat[] {
-  if (mode === 'survival') return SURVIVAL.map((s) => ({ round: s.title, item: s.item, scenario: s }));
-  return CHALLENGE.flatMap((r) => r.items.map((item) => ({ round: r.title, item })));
+function deck(_mode: Mode): Flat[] {
+  return SURVIVAL.map((s) => ({ round: s.title, item: s.item, scenario: s }));
 }
 
 /** Host screen: show on the projector. Scores live in this page only (nothing is stored or sent). */
@@ -57,7 +51,7 @@ export default function TangkhulGame({ initialPlayers = [] }: { initialPlayers?:
     const saved = load<{ name: string; score: number }[]>('players');
     if (Array.isArray(saved) && saved.length) setPlayers(saved.filter((p) => p && typeof p.name === 'string' && Number.isFinite(p.score)));
     const m = load<Mode>('mode');
-    if (m === 'challenge' || m === 'survival' || m === 'blank') setMode(m);
+    if (m === 'survival') setMode(m);
     setReady(true);
   }, []);
   useEffect(() => { if (ready) save('players', players); }, [players, ready]);
@@ -96,7 +90,7 @@ export default function TangkhulGame({ initialPlayers = [] }: { initialPlayers?:
     <>
       <span className="emoji">🏔️</span>
       <h1>Can you speak Tangkhul?</h1>
-      <p className="sub">A quiz where we learn a few words of the Tangkhul language, my mother tongue. Pick a game below. You can answer in Tamil or English, and everyone takes a turn!</p>
+      <p className="sub">A quiz where we learn a few words of the Tangkhul language, my mother tongue.</p>
       {mode ? (
         <>
           <button type="button" className="ghost" onClick={() => setMode(null)}>← All games</button>
